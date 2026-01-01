@@ -25,7 +25,6 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   Save as SaveIcon,
-  Download as DownloadIcon,
   Person as PersonIcon,
   LocationOn as LocationIcon,
   ContentCopy as ContentCopyIcon,
@@ -35,7 +34,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useSnackbar } from 'notistack'
 import { createInvoice, updateInvoice } from '../redux/slices/invoiceSlice'
 import { calculateGST } from '../utils/gstCalculator'
-import { generatePDF } from '../services/pdfGenerator'
 
 const GST_RATES = [0, 5, 12, 18, 28]
 
@@ -334,13 +332,6 @@ export default function GenerateInvoice({ editMode = false, invoiceId }) {
     }
   }
 
-  const handleDownloadPDF = () => {
-    setTimeout(() => {
-      generatePDF('invoice-pdf', 'gst-invoice.pdf')
-      enqueueSnackbar('Generating PDF...', { variant: 'info' })
-    }, 100)
-  }
-
   const copyBillingToShipping = () => {
     const billing = watch('customer.billingAddress')
     setValue('customer.shippingAddress', { ...billing })
@@ -385,26 +376,6 @@ export default function GenerateInvoice({ editMode = false, invoiceId }) {
         </Box>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Button
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-            onClick={handleDownloadPDF}
-            sx={{
-              borderRadius: '8px',
-              borderColor: '#475569',
-              color: '#e2e8f0',
-              fontWeight: 500,
-              fontSize: '0.875rem',
-              minHeight: 40,
-              px: 3,
-              '&:hover': {
-                borderColor: '#64748b',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)'
-              }
-            }}
-          >
-            Download PDF
-          </Button>
-          <Button
             variant="contained"
             startIcon={loading ? <CircularProgress size={20} sx={{ color: '#ffffff' }} /> : <SaveIcon />}
             onClick={handleSubmit(onSubmit)}
@@ -431,232 +402,7 @@ export default function GenerateInvoice({ editMode = false, invoiceId }) {
         </Box>
       </Box>
 
-      {/* PDF Content Container - Separate for PDF generation */}
-      <Box
-        id="invoice-pdf"
-        sx={{
-          backgroundColor: '#ffffff',
-          color: '#000000',
-          p: 0,
-          m: 0,
-          '& .MuiPaper-root': {
-            backgroundColor: '#ffffff',
-            color: '#000000',
-            boxShadow: 'none',
-            border: '1px solid #e5e7eb',
-            borderRadius: '4px',
-          },
-          '& .MuiTypography-root': {
-            color: '#000000',
-          },
-          '& .MuiTableCell-root': {
-            color: '#000000',
-            borderColor: '#e5e7eb',
-            backgroundColor: '#ffffff',
-          },
-          '& .MuiInputBase-root': {
-            color: '#000000',
-            backgroundColor: '#ffffff',
-            '& fieldset': {
-              borderColor: '#e5e7eb',
-            }
-          },
-          '& .MuiInputLabel-root': {
-            color: '#6b7280',
-          },
-          '& .pdf-hide': {
-            display: 'none !important',
-          },
-          '& button': {
-            display: 'none',
-          },
-          '& .MuiButton-root': {
-            display: 'none',
-          },
-          '& .MuiIconButton-root': {
-            display: 'none',
-          }
-        }}
-        style={{
-          display: 'none',
-          position: 'fixed',
-          left: '-9999px',
-          top: '-9999px'
-        }}
-      >
-        {/* PDF-only invoice content */}
-        <Box sx={{ p: 3 }}>
-          {/* Company Header for PDF */}
-          <Box sx={{ mb: 4, borderBottom: '2px solid #3b82f6', pb: 2 }}>
-            <Typography variant="h4" fontWeight="600" sx={{ color: '#1e40af', mb: 1 }}>
-              {company?.name || 'Your Company Name'}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#4b5563' }}>
-              {company?.address?.street || 'Street Address'}, {company?.address?.city || 'City'}, 
-              {company?.address?.state || 'State'} - {company?.address?.pincode || 'PIN'}
-            </Typography>
-            <Typography variant="body2" sx={{ color: '#4b5563' }}>
-              GSTIN: {company?.gstin || 'GSTIN Number'} | Phone: {company?.phone || 'Phone'}
-            </Typography>
-          </Box>
-
-          {/* Invoice Details Header */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={8}>
-              <Typography variant="h5" fontWeight="600" sx={{ color: '#111827', mb: 2 }}>
-                TAX INVOICE
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#6b7280', mb: 0.5 }}>
-                <strong>Bill To:</strong> {watch('customer.name') || 'Customer Name'}
-              </Typography>
-              <Typography variant="body2" sx={{ color: '#6b7280', mb: 0.5 }}>
-                {watch('customer.billingAddress.street') || 'Street'}, 
-                {watch('customer.billingAddress.city') || 'City'}, 
-                {watch('customer.billingAddress.state') || 'State'} - 
-                {watch('customer.billingAddress.pincode') || 'PIN'}
-              </Typography>
-              {watch('customer.gstin') && (
-                <Typography variant="body2" sx={{ color: '#6b7280' }}>
-                  GSTIN: {watch('customer.gstin')}
-                </Typography>
-              )}
-            </Grid>
-            <Grid item xs={4}>
-              <Box sx={{ 
-                border: '1px solid #e5e7eb', 
-                p: 2, 
-                borderRadius: '4px',
-                backgroundColor: '#f9fafb'
-              }}>
-                <Typography variant="body2" sx={{ color: '#6b7280', mb: 1 }}>
-                  <strong>Invoice No:</strong> {currentInvoice?.invoiceNumber || 'INV-001'}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#6b7280', mb: 1 }}>
-                  <strong>Date:</strong> {watch('invoiceDate') || new Date().toISOString().split('T')[0]}
-                </Typography>
-                <Typography variant="body2" sx={{ color: '#6b7280', mb: 1 }}>
-                  <strong>Due Date:</strong> {watch('dueDate') || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
-                </Typography>
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* Products Table for PDF */}
-          <TableContainer sx={{ mb: 4 }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow sx={{ backgroundColor: '#f3f4f6' }}>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }}>Description</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }}>HSN/SAC</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">Qty</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }}>Unit</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">Price</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">GST %</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">Taxable Value</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">CGST</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">SGST</TableCell>
-                  <TableCell sx={{ fontWeight: 600, color: '#374151', fontSize: '12px', py: 1 }} align="right">Total</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {fields.map((field, index) => (
-                  <TableRow key={field.id}>
-                    <TableCell sx={{ py: 1 }}>{watch(`products.${index}.description`) || 'Product/Service'}</TableCell>
-                    <TableCell sx={{ py: 1 }}>{watch(`products.${index}.hsnCode`) || '-'}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">{watch(`products.${index}.quantity`) || 1}</TableCell>
-                    <TableCell sx={{ py: 1 }}>{watch(`products.${index}.unit`) || 'Nos'}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">₹{formatCurrency(watch(`products.${index}.price`))}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">{watch(`products.${index}.gstRate`) || 18}%</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">₹{formatCurrency(watch(`products.${index}.taxableValue`))}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">₹{formatCurrency(watch(`products.${index}.cgstAmount`))}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">₹{formatCurrency(watch(`products.${index}.sgstAmount`))}</TableCell>
-                    <TableCell sx={{ py: 1 }} align="right">₹{formatCurrency(watch(`products.${index}.totalAmount`))}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          {/* Summary for PDF */}
-          <Grid container justifyContent="flex-end">
-            <Grid item xs={12} md={4}>
-              <Box sx={{ border: '1px solid #e5e7eb', p: 2, borderRadius: '4px' }}>
-                <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <span>Subtotal:</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
-                </Typography>
-                <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <span>CGST:</span>
-                  <span>₹{cgstTotal.toFixed(2)}</span>
-                </Typography>
-                <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <span>SGST:</span>
-                  <span>₹{sgstTotal.toFixed(2)}</span>
-                </Typography>
-                <Divider sx={{ my: 1 }} />
-                <Typography variant="body2" sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <span>Round Off:</span>
-                  <span>₹{roundOff.toFixed(2)}</span>
-                </Typography>
-                <Box sx={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  backgroundColor: '#f0f9ff',
-                  p: 1.5,
-                  borderRadius: '4px',
-                  border: '1px solid #bae6fd',
-                  mt: 2
-                }}>
-                  <Typography variant="h6" sx={{ fontSize: '14px', fontWeight: 600 }}>Net Payable:</Typography>
-                  <Typography variant="h5" sx={{ fontSize: '16px', fontWeight: 700, color: '#0369a1' }}>
-                    ₹{grandTotal.toFixed(2)}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          </Grid>
-
-          {/* Notes for PDF */}
-          {watch('notes') && (
-            <Box sx={{ mt: 4, pt: 2, borderTop: '1px solid #e5e7eb' }}>
-              <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Notes:</Typography>
-              <Typography variant="body2" sx={{ color: '#4b5563' }}>{watch('notes')}</Typography>
-            </Box>
-          )}
-
-          {/* Footer for PDF */}
-          <Box sx={{ mt: 6, pt: 3, borderTop: '1px solid #e5e7eb' }}>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Bank Details:</Typography>
-                <Typography variant="body2" sx={{ fontSize: '11px', color: '#6b7280' }}>
-                  {bank?.bankName || 'Bank Name'}<br />
-                  A/C No: {bank?.accountNumber || 'Account Number'}<br />
-                  IFSC: {bank?.ifscCode || 'IFSC Code'}
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Terms:</Typography>
-                <Typography variant="body2" sx={{ fontSize: '11px', color: '#6b7280' }}>
-                  {watch('paymentTerms') || 'Net 30'} Days<br />
-                  Subject to {company?.address?.city || 'City'} Jurisdiction
-                </Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Box sx={{ textAlign: 'right' }}>
-                  <Typography variant="body2" sx={{ fontWeight: 600, mb: 3 }}>Authorized Signatory</Typography>
-                  <Typography variant="body2" sx={{ fontSize: '11px', color: '#6b7280' }}>
-                    For {company?.name || 'Your Company Name'}
-                  </Typography>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* Main UI Content (visible on screen) */}
+      {/* Main UI Content */}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
           {/* Customer Details */}
