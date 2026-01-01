@@ -3,17 +3,26 @@
 <h1 align="center">🧾 Invoice Management System</h1>
 
 <p align="center">
-  <strong>A production-ready GST invoice creation, preview, and pixel-perfect PDF export platform</strong>
+  <strong>
+    A production-ready GST invoice creation, preview, and pixel-perfect PDF export platform
+  </strong>
 </p>
 
 <p align="center">
-  Invoice Management System is a full-stack application that enables businesses to
+  Invoice Management System is a full-stack web application that enables businesses to
   create, manage, preview, and download professional GST-compliant invoices.
 </p>
 
 <p align="center">
-  The project focuses heavily on real-world financial workflows, accurate tax calculations,
+  The project focuses on real-world financial workflows, accurate tax calculations,
   and <strong>reliable A4 PDF generation without layout breakage</strong>.
+</p>
+
+<p align="center">
+  🚀 <strong>Live Demo:</strong><br/>
+  <a href="https://project123-beta-ten.vercel.app" target="_blank">
+    https://project123-beta-ten.vercel.app
+  </a>
 </p>
 
 <hr/>
@@ -82,7 +91,7 @@
     </tr>
     <tr>
       <td><strong>Formatting</strong></td>
-      <td>INR Currency (en-IN), GST calculations</td>
+      <td>INR currency (en-IN), GST calculations</td>
     </tr>
   </tbody>
 </table>
@@ -109,12 +118,12 @@
     </tr>
     <tr>
       <td><strong>GST Calculation</strong></td>
-      <td>Automatic CGST & SGST calculation with round-off handling</td>
+      <td>Automatic CGST & SGST calculation with precise round-off handling</td>
       <td align="center">✅</td>
     </tr>
     <tr>
       <td><strong>Live Invoice Preview</strong></td>
-      <td>A4-sized preview that matches the final PDF exactly</td>
+      <td>A4-sized preview that exactly matches the final PDF output</td>
       <td align="center">✅</td>
     </tr>
     <tr>
@@ -124,12 +133,12 @@
     </tr>
     <tr>
       <td><strong>Invoice Status</strong></td>
-      <td>Draft, Generated, Paid, Overdue workflow</td>
+      <td>Draft, Generated, Paid, and Overdue workflow management</td>
       <td align="center">✅</td>
     </tr>
     <tr>
       <td><strong>Invoice Management</strong></td>
-      <td>Edit, delete, search, and download invoices</td>
+      <td>Edit, delete, search, filter, and download invoices</td>
       <td align="center">✅</td>
     </tr>
   </tbody>
@@ -146,24 +155,24 @@
 </p>
 
 <p>
-  Instead of generating PDFs from raw HTML strings or separate templates,
-  this system uses a <strong>single source of truth</strong>:
+  Instead of generating PDFs from separate templates or raw HTML strings,
+  the system follows a <strong>single source of truth</strong> approach:
 </p>
 
 <ul>
   <li>The same React component renders the on-screen invoice</li>
   <li>The same DOM tree is captured for PDF export</li>
-  <li>No color mismatch, overflow cut, or layout shifting</li>
+  <li>No color mismatch, overflow cutting, or layout shifting</li>
 </ul>
 
 <p>
-  The PDF pipeline is tuned specifically for:
+  The PDF pipeline is carefully tuned for:
 </p>
 
 <ul>
   <li>Exact A4 dimensions</li>
-  <li>Consistent margins</li>
-  <li>Safe scaling</li>
+  <li>Consistent margins and spacing</li>
+  <li>Safe scaling across devices</li>
   <li>Predictable page breaks</li>
 </ul>
 
@@ -175,14 +184,14 @@
 
 <ul>
   <li>
-    <strong>Frontend:</strong> Deployed on Vercel for fast global access.
+    <strong>Frontend:</strong> Deployed on Vercel for fast, global access.
   </li>
   <li>
     <strong>Backend:</strong> Hosted on Render as a long-running Node.js service.
   </li>
   <li>
-    <strong>Environment:</strong> Separate development and production
-    configurations via environment variables.
+    <strong>Environment:</strong> Separate development and production configurations
+    using environment variables.
   </li>
 </ul>
 
@@ -195,17 +204,7 @@
 <ul>
   <li>Email invoices directly to customers</li>
   <li>Automatic multi-page invoice splitting</li>
-  <li>Company logo & branding support</li>
-  <li>PDF watermarking & digital signatures</li>
-  <li>Bulk invoice export</li>
+  <li>Company branding with logo and theme customization</li>
+  <li>PDF watermarking and digital signatures</li>
+  <li>Bulk invoice export and reporting</li>
 </ul>
-
-<hr/>
-
-<!-- ========================== LICENSE ========================== -->
-
-<h2>📜 License</h2>
-
-<p>
-  This project is licensed under the MIT License.
-</p>
